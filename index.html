@@ -182,10 +182,19 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
-                const result = await response.json();
-                if (result.success) {
-                    messageDiv.className = 'message success';
-                    messageDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i> Registrado en Base de Datos. Redirigiendo...';
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        messageDiv.className = 'message success';
+                        messageDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i> Registrado en Base de Datos. Redirigiendo...';
+                    }
+                } else {
+                    const errorData = await response.json();
+                    alert('Error al guardar en la base de datos: ' + (errorData.error || 'Error desconocido'));
+                    console.error('Error detallado:', errorData);
+                    messageDiv.className = 'message warning';
+                    messageDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Guardado solo en WhatsApp por ahora.';
                 }
             } catch (error) {
                 console.error('Error DB:', error);

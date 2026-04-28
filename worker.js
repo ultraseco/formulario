@@ -70,7 +70,14 @@ export default {
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.message || JSON.stringify(result));
+        return new Response(JSON.stringify({ 
+          success: false, 
+          error: result.message || result.error || "Error en la API de Neon",
+          detail: result 
+        }), {
+          status: res.status,
+          headers: { ...cors, 'Content-Type': 'application/json' }
+        });
       }
 
       return new Response(JSON.stringify({ success: true, id: result.rows?.[0]?.id }), {
