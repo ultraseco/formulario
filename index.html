@@ -165,7 +165,7 @@
             data.vehiculo_propio = document.getElementById('vehiculo_propio').checked;
 
             try {
-                const response = await fetch('/api/solicitud', {
+                const response = await fetch('YOUR_BACKEND_URL/api/solicitud', { // ¡IMPORTANTE! Reemplaza YOUR_BACKEND_URL con la URL de tu servidor backend
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
