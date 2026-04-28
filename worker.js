@@ -1,8 +1,12 @@
 /**
  * Cloudflare Worker — Formulario Ultra Seco → Neon DB
- * Versión Final Estable con todos los campos
+ * VERSIÓN DEFINITIVA Y VALIDADA
  */
 const ALLOWED_ORIGINS = ['https://ultraseco.github.io', 'http://localhost:3000', 'http://127.0.0.1:5500'];
+
+const HOST = "ep-delicate-wildflower-an3rlco2.c-6.us-east-1.aws.neon.tech";
+const PASS = "npg_T1NavHdrmA5j"; // API Auth de Neon
+const CONN_STR = `postgresql://neondb_owner@${HOST}/neondb?sslmode=require`;
 
 export default {
   async fetch(request, env) {
@@ -52,11 +56,6 @@ export default {
         data.referencia_2_telefono || "",
         data.referencia_2_relacion || ""
       ];
-
-      // Credenciales oficiales obtenidas del entorno
-      const HOST = "ep-delicate-wildflower-an3rlco2.c-6.us-east-1.aws.neon.tech";
-      const PASS = "npg_T1NavHdrmA5j";
-      const CONN_STR = `postgresql://neondb_owner@${HOST}/neondb?sslmode=require`;
 
       const res = await fetch(`https://${HOST}/sql`, {
         method: 'POST',
