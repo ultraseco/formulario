@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <header>
         <a class="logo" href="#">
@@ -32,17 +34,20 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="nombres_completos">Nombres Completos</label>
-                        <input type="text" id="nombres_completos" name="nombres_completos" placeholder="Ej: Juan Antonio" required>
+                        <input type="text" id="nombres_completos" name="nombres_completos"
+                            placeholder="Ej: Juan Antonio" required>
                     </div>
                     <div class="form-group">
                         <label for="apellidos_completos">Apellidos Completos</label>
-                        <input type="text" id="apellidos_completos" name="apellidos_completos" placeholder="Ej: Pérez Rodríguez" required>
+                        <input type="text" id="apellidos_completos" name="apellidos_completos"
+                            placeholder="Ej: Pérez Rodríguez" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="cedula_identidad">Cédula de Identidad</label>
-                        <input type="text" id="cedula_identidad" name="cedula_identidad" placeholder="V-12345678" required>
+                        <input type="text" id="cedula_identidad" name="cedula_identidad" placeholder="V-12345678"
+                            required>
                     </div>
                     <div class="form-group">
                         <label for="fecha_nacimiento">Fecha de Nacimiento</label>
@@ -55,7 +60,8 @@
                 </div>
                 <div class="form-group">
                     <label for="domicilio">Domicilio (Dirección exacta)</label>
-                    <textarea id="domicilio" name="domicilio" rows="2" placeholder="Indique su dirección de residencia" required></textarea>
+                    <textarea id="domicilio" name="domicilio" rows="2" placeholder="Indique su dirección de residencia"
+                        required></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -64,23 +70,29 @@
                     </div>
                     <div class="form-group">
                         <label for="correo_electronico">Correo Electrónico</label>
-                        <input type="email" id="correo_electronico" name="correo_electronico" placeholder="usuario@ejemplo.com" required>
+                        <input type="email" id="correo_electronico" name="correo_electronico"
+                            placeholder="usuario@ejemplo.com" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Vehículo Propio</label>
                     <div class="radio-group">
                         <label class="radio-option">
-                            <input type="radio" name="vehiculo_propio_radio" value="si" onclick="document.getElementById('vehiculo_propio').checked = true; document.getElementById('vehiculo_info').style.display = 'block';"> Sí
+                            <input type="radio" name="vehiculo_propio_radio" value="si"
+                                onclick="document.getElementById('vehiculo_propio').checked = true; document.getElementById('vehiculo_info').style.display = 'block';">
+                            Sí
                         </label>
                         <label class="radio-option">
-                            <input type="radio" name="vehiculo_propio_radio" value="no" checked onclick="document.getElementById('vehiculo_propio').checked = false; document.getElementById('vehiculo_info').style.display = 'none';"> No
+                            <input type="radio" name="vehiculo_propio_radio" value="no" checked
+                                onclick="document.getElementById('vehiculo_propio').checked = false; document.getElementById('vehiculo_info').style.display = 'none';">
+                            No
                         </label>
                         <input type="checkbox" id="vehiculo_propio" name="vehiculo_propio" style="display:none">
                     </div>
                     <div id="vehiculo_info" style="display:none; margin-top: 1.5rem;">
                         <label for="vehiculo_modelo_year">Modelo / Año</label>
-                        <input type="text" id="vehiculo_modelo_year" name="vehiculo_modelo_year" placeholder="Ej: Toyota Corolla 2015">
+                        <input type="text" id="vehiculo_modelo_year" name="vehiculo_modelo_year"
+                            placeholder="Ej: Toyota Corolla 2015">
                     </div>
                 </div>
             </section>
@@ -88,14 +100,17 @@
             <!-- II. Perfil Comercial y Experiencia -->
             <section>
                 <h3><i class="fa-solid fa-briefcase"></i> II. Perfil Comercial y Experiencia</h3>
-                <p class="section-desc">Esta sección nos permite conocer tu trayectoria en el sector industrial y comercial.</p>
+                <p class="section-desc">Esta sección nos permite conocer tu trayectoria en el sector industrial y
+                    comercial.</p>
                 <div class="form-group">
                     <label for="experiencia_ferretera">Experiencia en el sector ferretero</label>
-                    <textarea id="experiencia_ferretera" name="experiencia_ferretera" rows="3" placeholder="Años de experiencia, áreas de especialidad o cargos desempeñados"></textarea>
+                    <textarea id="experiencia_ferretera" name="experiencia_ferretera" rows="3"
+                        placeholder="Años de experiencia, áreas de especialidad o cargos desempeñados"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="clientes_principales">Clientes Principales</label>
-                    <textarea id="clientes_principales" name="clientes_principales" rows="2" placeholder="Indique los 3 clientes o empresas más relevantes con los que trabaja actualmente"></textarea>
+                    <textarea id="clientes_principales" name="clientes_principales" rows="2"
+                        placeholder="Indique los 3 clientes o empresas más relevantes con los que trabaja actualmente"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="volumen_facturacion">Volumen de Facturación Promedio Mensual (Actual)</label>
@@ -150,48 +165,64 @@
     </main>
 
     <script>
-        document.getElementById('employmentForm').addEventListener('submit', async (e) => {
+        document.getElementById('employmentForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
             const messageDiv = document.getElementById('message');
-            
+
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
-            
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Ajuste para el checkbox de vehículo
-            data.vehiculo_propio = document.getElementById('vehiculo_propio').checked;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparando envío...';
 
-            try {
-                const response = await fetch('YOUR_BACKEND_URL/api/solicitud', { // ¡IMPORTANTE! Reemplaza YOUR_BACKEND_URL con la URL de tu servidor backend
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
-                });
+            const get = id => (document.getElementById(id) || {}).value || '';
+            const getN = name => {
+                const el = document.querySelector('[name="' + name + '"]');
+                return el ? el.value : '';
+            };
 
-                const result = await response.json();
-                if (result.success) {
-                    messageDiv.className = 'message success';
-                    messageDiv.innerText = '¡Solicitud enviada con éxito! Nos pondremos en contacto pronto.';
-                    e.target.reset();
-                    document.getElementById('vehiculo_info').style.display = 'none';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                    messageDiv.className = 'message error';
-                    messageDiv.innerText = 'Error: ' + result.error;
-                }
-            } catch (error) {
-                messageDiv.className = 'message error';
-                messageDiv.innerText = 'Error de conexión con el servidor.';
-            } finally {
+            const vehiculoTiene = document.getElementById('vehiculo_propio').checked;
+            const vehiculoModelo = get('vehiculo_modelo_year');
+
+            const msg = [
+                '🟦 *NUEVA FICHA DE TRABAJO - ULTRA SECO*',
+                '',
+                '👤 *I. INFORMACIÓN PERSONAL*',
+                '• Nombres: ' + get('nombres_completos'),
+                '• Apellidos: ' + get('apellidos_completos'),
+                '• Cédula: ' + get('cedula_identidad'),
+                '• Fecha de Nacimiento: ' + get('fecha_nacimiento'),
+                '• Nacionalidad: ' + get('nacionalidad'),
+                '• Domicilio: ' + get('domicilio'),
+                '• Teléfono: ' + get('telefono_movil'),
+                '• Correo: ' + get('correo_electronico'),
+                '• Vehículo Propio: ' + (vehiculoTiene ? 'Sí — ' + vehiculoModelo : 'No'),
+                '',
+                '💼 *II. PERFIL COMERCIAL*',
+                '• Exp. Ferretera: ' + (get('experiencia_ferretera') || '(no indicada)'),
+                '• Clientes Principales: ' + (get('clientes_principales') || '(no indicados)'),
+                '• Vol. Facturación: ' + (get('volumen_facturacion') || '(no indicado)'),
+                '',
+                '👥 *III. REFERENCIAS PERSONALES*',
+                '• Ref 1: ' + (getN('referencia_1_nombre') || '(no indicada)') + ' | Tel: ' + (getN('referencia_1_telefono') || '-') + ' | Relación: ' + (getN('referencia_1_relacion') || '-'),
+                '• Ref 2: ' + (getN('referencia_2_nombre') || '(no indicada)') + ' | Tel: ' + (getN('referencia_2_telefono') || '-') + ' | Relación: ' + (getN('referencia_2_relacion') || '-'),
+            ].join('\n');
+
+            const waUrl = 'https://wa.me/584146023797?text=' + encodeURIComponent(msg);
+
+            // Mostrar mensaje de éxito
+            messageDiv.className = 'message success';
+            messageDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i> ¡Solicitud lista! Serás redirigido a WhatsApp para confirmar el envío.';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Breve pausa y abrir WhatsApp
+            setTimeout(function() {
+                e.target.reset();
+                document.getElementById('vehiculo_info').style.display = 'none';
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar Solicitud';
-            }
+                window.open(waUrl, '_blank');
+            }, 1200);
         });
     </script>
 </body>
+
 </html>
