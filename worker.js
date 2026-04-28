@@ -60,8 +60,7 @@ export default {
       const res = await fetch(`https://${HOST}/sql`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${PASS}`,
-          'Neon-Connection-String': CONN_STR,
+          'Neon-Connection-String': `postgresql://neondb_owner:${PASS}@${HOST}/neondb`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ query: sql, params: values })
