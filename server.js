@@ -18,7 +18,7 @@ const pool = new Pool({
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static(__dirname));
 
 // Ruta para guardar la solicitud
 app.post('/api/solicitud', async (req, res) => {
