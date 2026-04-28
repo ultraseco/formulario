@@ -1,0 +1,8 @@
+name = "formulario-ultraseco"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# DATABASE_URL se configura como secret en el dashboard de Cloudflare
+# Ejecutar: npx wrangler secret put DATABASE_URL

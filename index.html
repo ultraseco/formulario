@@ -165,64 +165,109 @@
     </main>
 
     <script>
-        document.getElementById('employmentForm').addEventListener('submit', function(e) {
+        // URL del Cloudflare Worker que guarda en Neon
+        // Actualizar con la URL real después de hacer: npx wrangler deploy
+        const WORKER_URL = 'https://formulario-ultraseco.valkash00.workers.dev/';
+
+        document.getElementById('employmentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
             const messageDiv = document.getElementById('message');
 
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparando envío...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando solicitud...';
 
+            // Recoger datos
             const get = id => (document.getElementById(id) || {}).value || '';
             const getN = name => {
                 const el = document.querySelector('[name="' + name + '"]');
                 return el ? el.value : '';
             };
-
             const vehiculoTiene = document.getElementById('vehiculo_propio').checked;
-            const vehiculoModelo = get('vehiculo_modelo_year');
 
-            const msg = [
+            const formData = {
+                nombres_completos:      get('nombres_completos'),
+                apellidos_completos:    get('apellidos_completos'),
+                cedula_identidad:       get('cedula_identidad'),
+                fecha_nacimiento:       get('fecha_nacimiento'),
+                nacionalidad:           get('nacionalidad'),
+                domicilio:              get('domicilio'),
+                telefono_movil:         get('telefono_movil'),
+                correo_electronico:     get('correo_electronico'),
+                vehiculo_propio:        vehiculoTiene,
+                vehiculo_modelo_year:   get('vehiculo_modelo_year'),
+                experiencia_ferretera:  get('experiencia_ferretera'),
+                clientes_principales:   get('clientes_principales'),
+                volumen_facturacion:    get('volumen_facturacion'),
+                referencia_1_nombre:    getN('referencia_1_nombre'),
+                referencia_1_telefono:  getN('referencia_1_telefono'),
+                referencia_1_relacion:  getN('referencia_1_relacion'),
+                referencia_2_nombre:    getN('referencia_2_nombre'),
+                referencia_2_telefono:  getN('referencia_2_telefono'),
+                referencia_2_relacion:  getN('referencia_2_relacion'),
+            };
+
+            // Mensaje WhatsApp (siempre preparado como respaldo)
+            const waMsg = [
                 '🟦 *NUEVA FICHA DE TRABAJO - ULTRA SECO*',
                 '',
                 '👤 *I. INFORMACIÓN PERSONAL*',
-                '• Nombres: ' + get('nombres_completos'),
-                '• Apellidos: ' + get('apellidos_completos'),
-                '• Cédula: ' + get('cedula_identidad'),
-                '• Fecha de Nacimiento: ' + get('fecha_nacimiento'),
-                '• Nacionalidad: ' + get('nacionalidad'),
-                '• Domicilio: ' + get('domicilio'),
-                '• Teléfono: ' + get('telefono_movil'),
-                '• Correo: ' + get('correo_electronico'),
-                '• Vehículo Propio: ' + (vehiculoTiene ? 'Sí — ' + vehiculoModelo : 'No'),
+                '• Nombres: ' + formData.nombres_completos,
+                '• Apellidos: ' + formData.apellidos_completos,
+                '• Cédula: ' + formData.cedula_identidad,
+                '• Fecha de Nacimiento: ' + formData.fecha_nacimiento,
+                '• Nacionalidad: ' + formData.nacionalidad,
+                '• Domicilio: ' + formData.domicilio,
+                '• Teléfono: ' + formData.telefono_movil,
+                '• Correo: ' + formData.correo_electronico,
+                '• Vehículo Propio: ' + (vehiculoTiene ? 'Sí — ' + formData.vehiculo_modelo_year : 'No'),
                 '',
                 '💼 *II. PERFIL COMERCIAL*',
-                '• Exp. Ferretera: ' + (get('experiencia_ferretera') || '(no indicada)'),
-                '• Clientes Principales: ' + (get('clientes_principales') || '(no indicados)'),
-                '• Vol. Facturación: ' + (get('volumen_facturacion') || '(no indicado)'),
+                '• Exp. Ferretera: ' + (formData.experiencia_ferretera || '(no indicada)'),
+                '• Clientes Principales: ' + (formData.clientes_principales || '(no indicados)'),
+                '• Vol. Facturación: ' + (formData.volumen_facturacion || '(no indicado)'),
                 '',
                 '👥 *III. REFERENCIAS PERSONALES*',
-                '• Ref 1: ' + (getN('referencia_1_nombre') || '(no indicada)') + ' | Tel: ' + (getN('referencia_1_telefono') || '-') + ' | Relación: ' + (getN('referencia_1_relacion') || '-'),
-                '• Ref 2: ' + (getN('referencia_2_nombre') || '(no indicada)') + ' | Tel: ' + (getN('referencia_2_telefono') || '-') + ' | Relación: ' + (getN('referencia_2_relacion') || '-'),
+                '• Ref 1: ' + (formData.referencia_1_nombre || '(no indicada)') + ' | Tel: ' + (formData.referencia_1_telefono || '-') + ' | Relación: ' + (formData.referencia_1_relacion || '-'),
+                '• Ref 2: ' + (formData.referencia_2_nombre || '(no indicada)') + ' | Tel: ' + (formData.referencia_2_telefono || '-') + ' | Relación: ' + (formData.referencia_2_relacion || '-'),
             ].join('\n');
+            const waUrl = 'https://wa.me/584146023797?text=' + encodeURIComponent(waMsg);
 
-            const waUrl = 'https://wa.me/584146023797?text=' + encodeURIComponent(msg);
+            // 1. Intentar guardar en Neon via Worker
+            let dbOk = false;
+            try {
+                const res = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+                const result = await res.json();
+                dbOk = result.success === true;
+            } catch (err) {
+                console.warn('Worker no disponible, solo WhatsApp:', err);
+            }
 
-            // Mostrar mensaje de éxito
-            messageDiv.className = 'message success';
-            messageDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i> ¡Solicitud lista! Serás redirigido a WhatsApp para confirmar el envío.';
+            // 2. Mostrar resultado y abrir WhatsApp
+            if (dbOk) {
+                messageDiv.className = 'message success';
+                messageDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i> ¡Solicitud registrada en nuestra base de datos! Serás redirigido a WhatsApp para confirmar.';
+            } else {
+                messageDiv.className = 'message success';
+                messageDiv.innerHTML = '<i class="fa-brands fa-whatsapp"></i> ¡Solicitud lista! Serás redirigido a WhatsApp para enviarla directamente.';
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Breve pausa y abrir WhatsApp
             setTimeout(function() {
                 e.target.reset();
                 document.getElementById('vehiculo_info').style.display = 'none';
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar Solicitud';
                 window.open(waUrl, '_blank');
-            }, 1200);
+            }, 1500);
         });
     </script>
+
 </body>
 
 </html>
