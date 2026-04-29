@@ -4,8 +4,8 @@
  */
 const ALLOWED_ORIGINS = ['https://ultraseco.github.io', 'http://localhost:3000', 'http://127.0.0.1:5500'];
 
-const HOST = "ep-delicate-wildflower-an3rlco2.c-6.us-east-1.aws.neon.tech";
-const PASS = "npg_T1NavHdrmA5j"; // API Auth de Neon
+const HOST = "ep-snowy-unit-amlmh4fj.c-5.us-east-1.aws.neon.tech";
+const PASS = "npg_G14qwkDRAoQn"; // API Auth de Neon
 const CONN_STR = `postgresql://neondb_owner@${HOST}/neondb?sslmode=require`;
 
 export default {
@@ -18,6 +18,28 @@ export default {
     };
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+    
+    if (request.method === 'GET') {
+      try {
+        const sql = `SELECT * FROM solicitudes_empleo ORDER BY created_at DESC;`;
+        const res = await fetch(`https://${HOST}/sql`, {
+          method: 'POST',
+          headers: {
+            'Neon-Connection-String': CONN_STR,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ query: sql, params: [] })
+        });
+        const result = await res.json();
+        if (!res.ok) {
+          return new Response(JSON.stringify({ success: false, error: result.message || result.error }), { status: res.status, headers: { ...cors, 'Content-Type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ success: true, data: result.rows || [] }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
+      } catch (err) {
+        return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
+    }
+
     if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: cors });
 
     try {
@@ -60,7 +82,7 @@ export default {
       const res = await fetch(`https://${HOST}/sql`, {
         method: 'POST',
         headers: {
-          'Neon-Connection-String': `postgresql://neondb_owner:${PASS}@${HOST}/neondb`,
+          'Neon-Connection-String': CONN_STR,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ query: sql, params: values })

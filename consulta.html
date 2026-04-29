@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Postulaciones - Ultra Seco</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../images/logo.png">
+    <style>
+        /* Estilos específicos para Consulta */
+        .controls-container {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 1rem;
+            margin-left: auto;
+        }
+
+        .btn-secondary {
+            background: #475569;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: #334155;
+        }
+
+        .records-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        }
+
+        .record-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .record-card:hover {
+            box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+            transform: translateY(-2px);
+        }
+
+        .record-card.selected {
+            border-color: var(--ultra-blue);
+            background: #f0fdf4;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .card-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--ultra-dark);
+        }
+
+        .card-header p {
+            margin: 0.25rem 0 0 0;
+            color: var(--ultra-slate);
+            font-size: 0.9rem;
+        }
+
+        .select-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--ultra-light-slate);
+            font-size: 0.8rem;
+        }
+
+        .info-value {
+            color: var(--ultra-dark);
+        }
+        
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #475569;
+        }
+        .tag.blue { background: #dbeafe; color: #1d4ed8; }
+        .tag.green { background: #dcfce7; color: #15803d; }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: var(--ultra-slate);
+        }
+
+        /* Ocultar elementos al imprimir */
+        @media print {
+            body { background: white; }
+            header, .controls-container, .btn-secondary { display: none !important; }
+            main { padding-top: 0 !important; max-width: 100% !important; }
+            
+            .records-grid {
+                display: block;
+            }
+            .record-card {
+                display: none; /* Ocultar todas por defecto en impresion */
+                page-break-inside: avoid;
+                margin-bottom: 2rem;
+                border: 1px solid #ccc;
+                box-shadow: none;
+            }
+            .record-card.print-selected {
+                display: block; /* Mostrar solo las seleccionadas */
+            }
+            .select-checkbox {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="../images/logo.png" alt="Ultra Seco Logo" class="logo">
+            <h1>Panel de Postulaciones</h1>
+        </div>
+    </header>
+
+    <main class="container" style="max-width: 1200px;">
+        <div class="controls-container">
+            <div class="filter-group">
+                <label>Buscar por Nombre o Cédula</label>
+                <input type="text" id="searchInput" placeholder="Ej: Perez, V-1234..." oninput="applyFilters()">
+            </div>
+            
+            <div class="filter-group">
+                <label>Vehículo Propio</label>
+                <select id="vehicleFilter" onchange="applyFilters()">
+                    <option value="all">Todos</option>
+                    <option value="yes">Sí poseen</option>
+                    <option value="no">No poseen</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Ordenar Por</label>
+                <select id="sortFilter" onchange="applyFilters()">
+                    <option value="date_desc">Más recientes primero</option>
+                    <option value="date_asc">Más antiguos primero</option>
+                    <option value="exp_desc">Experiencia (Mayor texto)</option>
+                    <option value="clients_desc">Cartera Clientes (Mayor texto)</option>
+                </select>
+            </div>
+
+            <div class="action-btns">
+                <button class="btn-secondary" onclick="printSelected()">
+                    <i class="fa-solid fa-print"></i> Imprimir Seleccionados
+                </button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <i class="fa-solid fa-spinner fa-spin"></i> Cargando datos de Neon DB...
+        </div>
+
+        <div id="recordsGrid" class="records-grid">
+            <!-- Cards will be injected here -->
+        </div>
+    </main>
+
+    <script>
+        const WORKER_URL = 'https://formulario-ultraseco.workthingstesting.workers.dev/';
+        let allRecords = [];
+
+        async function fetchRecords() {
+            try {
+                const response = await fetch(WORKER_URL);
+                const result = await response.json();
+                
+                if (result.success) {
+                    allRecords = result.data;
+                    applyFilters();
+                } else {
+                    document.getElementById('recordsGrid').innerHTML = `<p style="color:red">Error: ${result.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('recordsGrid').innerHTML = `<p style="color:red">Error de conexión: ${error.message}</p>`;
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const vehicle = document.getElementById('vehicleFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+
+            // Filtrar
+            let filtered = allRecords.filter(record => {
+                const name = `${record.nombres_completos} ${record.apellidos_completos}`.toLowerCase();
+                const cid = (record.cedula_identidad || '').toLowerCase();
+                
+                const matchesSearch = name.includes(search) || cid.includes(search);
+                
+                let matchesVehicle = true;
+                if (vehicle === 'yes') matchesVehicle = record.vehiculo_propio === true;
+                if (vehicle === 'no') matchesVehicle = record.vehiculo_propio === false;
+
+                return matchesSearch && matchesVehicle;
+            });
+
+            // Ordenar
+            filtered.sort((a, b) => {
+                if (sort === 'date_desc') return new Date(b.created_at) - new Date(a.created_at);
+                if (sort === 'date_asc') return new Date(a.created_at) - new Date(b.created_at);
+                if (sort === 'exp_desc') {
+                    const lenA = (a.experiencia_ferretera || '').length;
+                    const lenB = (b.experiencia_ferretera || '').length;
+                    return lenB - lenA;
+                }
+                if (sort === 'clients_desc') {
+                    const lenA = (a.clientes_principales || '').length;
+                    const lenB = (b.clientes_principales || '').length;
+                    return lenB - lenA;
+                }
+                return 0;
+            });
+
+            renderRecords(filtered);
+        }
+
+        function renderRecords(records) {
+            const grid = document.getElementById('recordsGrid');
+            grid.innerHTML = '';
+
+            if (records.length === 0) {
+                grid.innerHTML = '<p>No se encontraron registros que coincidan con los filtros.</p>';
+                return;
+            }
+
+            records.forEach(record => {
+                const date = new Date(record.created_at).toLocaleDateString('es-VE');
+                const hasCar = record.vehiculo_propio;
+                
+                const card = document.createElement('div');
+                card.className = 'record-card';
+                
+                // Vehículo Tag
+                const carTag = hasCar 
+                    ? `<span class="tag blue"><i class="fa-solid fa-car"></i> Vehículo: ${record.vehiculo_modelo_year || 'Sí'}</span>`
+                    : `<span class="tag"><i class="fa-solid fa-person-walking"></i> Sin Vehículo</span>`;
+                
+                // Info Grid
+                const html = `
+                    <div class="card-header">
+                        <div>
+                            <h4>${record.nombres_completos} ${record.apellidos_completos}</h4>
+                            <p><i class="fa-regular fa-id-card"></i> ${record.cedula_identidad} | <i class="fa-regular fa-calendar"></i> ${date}</p>
+                        </div>
+                        <input type="checkbox" class="select-checkbox" data-id="${record.id}" onchange="toggleCard(this)">
+                    </div>
+                    
+                    <div class="tags">
+                        ${carTag}
+                        <span class="tag green"><i class="fa-brands fa-whatsapp"></i> ${record.telefono_movil}</span>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Correo</span>
+                            <span class="info-value">${record.correo_electronico || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Nacionalidad / Edad</span>
+                            <span class="info-value">${record.nacionalidad}</span>
+                        </div>
+                        <div class="info-item full-width">
+                            <span class="info-label">Domicilio</span>
+                            <span class="info-value">${record.domicilio}</span>
+                        </div>
+                        
+                        <div class="info-item full-width" style="margin-top: 10px;">
+                            <span class="info-label" style="color: var(--ultra-blue)">Experiencia Ferretera</span>
+                            <span class="info-value">${record.experiencia_ferretera || 'No especificada'}</span>
+                        </div>
+                        <div class="info-item full-width">
+                            <span class="info-label" style="color: var(--ultra-blue)">Cartera de Clientes</span>
+                            <span class="info-value">${record.clientes_principales || 'No especificada'}</span>
+                        </div>
+                        
+                        <div class="info-item full-width" style="margin-top: 10px;">
+                            <span class="info-label">Referencias</span>
+                            <span class="info-value">
+                                1. ${record.referencia_1_nombre || 'N/A'} (${record.referencia_1_telefono || ''})<br>
+                                2. ${record.referencia_2_nombre || 'N/A'} (${record.referencia_2_telefono || ''})
+                            </span>
+                        </div>
+                    </div>
+                `;
+                
+                card.innerHTML = html;
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleCard(checkbox) {
+            const card = checkbox.closest('.record-card');
+            if (checkbox.checked) {
+                card.classList.add('selected');
+                card.classList.add('print-selected');
+            } else {
+                card.classList.remove('selected');
+                card.classList.remove('print-selected');
+            }
+        }
+
+        function printSelected() {
+            const selected = document.querySelectorAll('.select-checkbox:checked');
+            if (selected.length === 0) {
+                alert('Por favor, selecciona al menos una postulación marcando la casilla correspondiente para imprimir.');
+                return;
+            }
+            window.print();
+        }
+
+        // Cargar registros al iniciar
+        fetchRecords();
+    </script>
+</body>
+</html>
